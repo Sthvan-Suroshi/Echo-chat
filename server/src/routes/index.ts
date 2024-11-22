@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { login } from "../controllers/auth.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
-import { destroy, index, show, store, update } from "../controllers/group.controller.js";
+import { destroy, index, show, store, update } from "../controllers/chatGroup.controller.js";
 const router = Router();
 //Auth
 router.post("/auth/login", login);
