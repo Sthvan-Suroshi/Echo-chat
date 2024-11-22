@@ -8,7 +8,7 @@ export const store = async (req: Request, res: Response) => {
     const user = req.user;
 
     await prisma.chatGroup.create({
-      data: { title: body.title, password: body.password, user_id: user.id },
+      data: { title: body.title, password: body.password, user_id: user.id }
     });
 
     return res.json({ message: "Group created successfully" });
@@ -22,7 +22,7 @@ export const index = async (req: Request, res: Response) => {
   try {
     const groups = await prisma.chatGroup.findMany({
       where: { user_id: req.user?.id },
-      orderBy: { created_at: "desc" },
+      orderBy: { created_at: "desc" }
     });
 
     return res.json({ message: "Groups fetched successfully", data: groups });
@@ -36,7 +36,7 @@ export const show = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const group = await prisma.chatGroup.findUnique({
-      where: { id: id },
+      where: { id: id }
     });
 
     return res.json({ message: "Group fetched successfully", data: group });
@@ -53,8 +53,8 @@ export const update = async (req: Request, res: Response) => {
       where: { id: id },
       data: {
         title: req.body.title,
-        password: req.body.password,
-      },
+        password: req.body.password
+      }
     });
 
     return res.json({ message: "Group updated successfully", data: updatedGroup });
@@ -68,7 +68,7 @@ export const destroy = async (req: Request, res: Response) => {
 
   try {
     const deletedGroup = await prisma.chatGroup.delete({
-      where: { id: id },
+      where: { id: id }
     });
 
     return res.json({ message: "Group deleted successfully", data: deletedGroup });
