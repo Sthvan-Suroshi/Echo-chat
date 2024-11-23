@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { prisma } from "../config/db.config.js";
-import asyncHandler from "express-async-handler";
 
 interface LoginPayloadType {
   name: string;

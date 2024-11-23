@@ -18,7 +18,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <SessionProvider>
         <body className={cn("min-h-screen bg-background font-sans antialiased")}>{children}</body>
-        {/* <Toaster richColors position="bottom-right" toastOptions={{ duration: 5000 }} /> */}
+        <Toaster richColors position="bottom-right" toastOptions={{ duration: 5000 }} />
       </SessionProvider>
     </html>
   );
