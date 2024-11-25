@@ -37,5 +37,5 @@ export async function fetchChatGroup(id: string) {
     return response.data;
   }
 
-  return [];
+  return null;
 }

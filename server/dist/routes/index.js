@@ -9,7 +9,7 @@ router.post("/auth/login", login);
 router.route("/chat-group").post(authMiddleware, store).get(authMiddleware, index);
 router
     .route("/chat-group/:id")
-    .get(authMiddleware, show)
+    .get(show)
     .delete(authMiddleware, destroy)
     .put(authMiddleware, update);
 export default router;
