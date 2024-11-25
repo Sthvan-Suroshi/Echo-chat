@@ -25,6 +25,8 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "@socket.io/admin-ui": "^0.5.1",
+    "@socket.io/redis-streams-adapter": "^0.2.2",
     "@types/jsonwebtoken": "^9.0.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

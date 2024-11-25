@@ -4,13 +4,22 @@ import cors from "cors";
 import { Server } from "socket.io";
 import { createServer } from "http";
 import { setupSocket } from "./socket.js";
+import { createAdapter } from "@socket.io/redis-streams-adapter";
+import { instrument } from "@socket.io/admin-ui";
 const PORT = process.env.PORT || 7000;
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "*"
-    }
+        origin: ["http://localhost:3000", "https://admin.socket.io"],
+        credentials: true
+    },
+    adapter: createAdapter(redis)
+});
+// socket io admin to track the connections, rooms etc
+instrument(io, {
+    auth: false,
+    mode: "development"
 });
 setupSocket(io); // this function runs for each new connection
 export { io };
@@ -22,6 +31,7 @@ app.get("/", (req, res) => {
 });
 //importing the routes
 import authRoutes from "./routes/index.js";
+import redis from "./config/redis.config.js";
 //using the routes
 app.use("/api", authRoutes);
 server.listen(PORT, () => console.log(`Server is running on PORT ${PORT}`));
