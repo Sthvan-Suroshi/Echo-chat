@@ -30,7 +30,7 @@ export function setupSocket(io: Server) {
       // socket.broadcast.emit("message", data);
 
       //Send message to the room only
-      io.to(socket.room).emit("message", data);
+      socket.to(socket.room).emit("message", data);
     });
 
     socket.on("disconnect", () => {

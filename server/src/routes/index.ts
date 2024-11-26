@@ -8,6 +8,7 @@ router.post("/auth/login", login);
 
 //Chat group
 router.route("/chat-group").post(authMiddleware, store).get(authMiddleware, index);
+
 router
   .route("/chat-group/:id")
   .get(show)

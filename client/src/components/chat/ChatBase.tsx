@@ -1,39 +1,43 @@
 "use client";
 
-import { getSocket } from "@/lib/socket.config";
-import React, { useEffect, useMemo } from "react";
-import { v4 as uuidV4 } from "uuid";
-import { Button } from "../ui/button";
+import React, { useEffect, useMemo, useState } from "react";
 
-export default function ChatBase({ groupId }: { groupId: string }) {
-  let socket = useMemo(() => {
-    // using memo because for every re-render the new socket instance should not be created
-    const socket = getSocket();
+import ChatSidebar from "./ChatSidebar";
+import ChatNav from "./ChatNav";
+import ChatUserDialog from "./ChatUserDailog";
+import Chats from "./Chat";
 
-    socket.auth = {
-      room: groupId,
-    };
-
-    return socket.connect();
-  }, []);
+export default function ChatBase({
+  group,
+  users,
+  oldMessages,
+}: {
+  group: ChatGroupType;
+  users: Array<GroupChatUserType> | [];
+  oldMessages: Array<MessageType> | [];
+}) {
+  const [open, setOpen] = useState(true);
+  const [chatUser, setChatUser] = useState<GroupChatUserType | null>(null);
 
   useEffect(() => {
-    socket.on("message", (data) => {
-      console.log(data);
-    });
-
-    return () => {
-      socket.disconnect(); //whenever the component unmounts the socket should be disconnected to avoid memory leak
-    };
-  }, []);
-
-  const handleClick = () => {
-    socket.emit("message", { name: "Sthvan", id: uuidV4() });
-  };
-
+    const data = localStorage.getItem(group.id);
+    if (data) {
+      const passedData = JSON.parse(data);
+      setChatUser(passedData);
+    }
+  }, [group.id]);
   return (
-    <div>
-      <Button onClick={handleClick}>Send Message</Button>
+    <div className="flex">
+      <ChatSidebar users={users} />
+      <div className="w-full md:w-4/5 bg-white">
+        {open ? (
+          <ChatUserDialog open={open} setOpen={setOpen} group={group} />
+        ) : (
+          <ChatNav chatGroup={group} users={users} />
+        )}
+
+        <Chats group={group} chatUser={chatUser} oldMessages={oldMessages} />
+      </div>
     </div>
   );
 }

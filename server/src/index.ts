@@ -6,6 +6,7 @@ import { createServer } from "http";
 import { setupSocket } from "./socket.js";
 import { createAdapter } from "@socket.io/redis-streams-adapter";
 import { instrument } from "@socket.io/admin-ui";
+import redis from "./config/redis.config.js";
 
 const PORT = process.env.PORT || 7000;
 const app: Application = express();
@@ -38,9 +39,12 @@ app.get("/", (req: Request, res: Response) => {
 
 //importing the routes
 import authRoutes from "./routes/index.js";
-import redis from "./config/redis.config.js";
+import chatGroupRoutes from "./routes/chatGroupUsers.route.js";
+import chatsRoutes from "./routes/chats.route.js";
 
 //using the routes
 app.use("/api", authRoutes);
+app.use("/api", chatGroupRoutes);
+app.use("/api", chatsRoutes);
 
 server.listen(PORT, () => console.log(`Server is running on PORT ${PORT}`));
