@@ -57,6 +57,9 @@ export default function GroupChatCardMenu({
           <DropdownMenuItem onClick={handleCopy}>Copy</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setEditDialog(true)}>Edit</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setDeleteDialog(true)}>Delete</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => window.open(`/chat/${group.id}`)}>
+            Open chat
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>
