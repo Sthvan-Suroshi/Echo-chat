@@ -4,7 +4,9 @@ import { fetchChatGroup, fetchChatUsers } from "@/fetch/groupFetch";
 import { notFound } from "next/navigation";
 import React from "react";
 
-export default async function Chat({ params }: { params: { id: string } }) {
+type Params = Promise<{ id: string }>; // nextjs 15 change
+
+export default async function Chat({ params }: { params: Params }) {
   // Ensure params is awaited
   const { id } = await params;
 
