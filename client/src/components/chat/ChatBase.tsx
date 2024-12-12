@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import ChatSidebar from "./ChatSidebar";
 import ChatNav from "./ChatNav";
-import ChatUserDialog from "./ChatUserDailog";
-import Chats from "./Chat";
+import Chat from "./Chat";
 import { fetchChatUsers } from "@/fetch/groupFetch";
+import ChatUserDialog from "./ChatUserDailog";
 
 export default function ChatBase({
   group,
@@ -20,7 +20,6 @@ export default function ChatBase({
   const [chatUser, setChatUser] = useState<GroupChatUserType | null>(null);
   const [users, setUsers] = useState<Array<GroupChatUserType>>(initialUsers);
 
-  // Fetch users from localStorage on component mount
   useEffect(() => {
     const data = localStorage.getItem(group.id);
     if (data) {
@@ -29,28 +28,28 @@ export default function ChatBase({
     }
   }, [group.id, users]);
 
-  // Function to refresh the user list
   const refreshUsers = async () => {
     const updatedUsers = await fetchChatUsers(group.id);
     setUsers(updatedUsers);
   };
 
   return (
-    <div className="flex">
+    <div className="flex h-screen bg-gray-900 overflow-hidden">
       <ChatSidebar users={users} />
-      <div className="w-full md:w-4/5 bg-white">
-        {open ? (
-          <ChatUserDialog
-            open={open}
-            setOpen={setOpen}
-            group={group}
-            onUserAdded={refreshUsers} // Trigger refresh when a user is added
-          />
-        ) : (
-          <ChatNav chatGroup={group} users={users} />
-        )}
-
-        <Chats group={group} chatUser={chatUser} oldMessages={oldMessages} />
+      <div className="flex-1 flex flex-col">
+        <ChatNav chatGroup={group} users={users} user={chatUser} />
+        <div className="flex-1">
+          {open ? (
+            <ChatUserDialog
+              open={open}
+              setOpen={setOpen}
+              group={group}
+              onUserAdded={refreshUsers}
+            />
+          ) : (
+            <Chat group={group} chatUser={chatUser} oldMessages={oldMessages} />
+          )}
+        </div>
       </div>
     </div>
   );

@@ -21,6 +21,7 @@ import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 import { CHAT_GROUP_URL } from "@/lib/apiEndPoints";
 import { clearCache } from "@/actions/common";
+import { Plus } from "lucide-react";
 
 export default function CreateChat({ user }: { user: CustomUser }) {
   const [open, setOpen] = useState(false);
@@ -50,8 +51,6 @@ export default function CreateChat({ user }: { user: CustomUser }) {
         }
       );
 
-      console.log(data?.message);
-
       if (data?.message) {
         setLoading(false);
         setOpen(false);
@@ -61,62 +60,58 @@ export default function CreateChat({ user }: { user: CustomUser }) {
     } catch (error) {
       setLoading(false);
       if (error instanceof AxiosError) {
-        console.log(error);
         toast.error(error.message);
       } else {
-        toast.error("Something went wrong. Please try again !");
+        toast.error("Something went wrong. Please try again!");
       }
     }
   };
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button>Create Group</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create a new chat</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit(submit)}>
-            <div className="grid gap-4 py-4">
-              <div className="flex flex-col space-y-1.5">
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Group Name
-                </label>
-                <Input
-                  type="text"
-                  {...register("title")}
-                  placeholder="Enter Group Name"
-                  className="w-full rounded-md border border-gray-300 bg-gray-50 p-3 text-sm placeholder:text-gray-600 focus:ring-0"
-                />
-                {errors.title && (
-                  <span className="text-xs text-red-600">{errors.title.message}</span>
-                )}
-
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Password
-                </label>
-                <Input
-                  type="password"
-                  {...register("password")}
-                  placeholder="Enter Password"
-                  className="w-full rounded-md border border-gray-300 bg-gray-50 p-3 text-sm placeholder:text-gray-600 focus:ring-0"
-                />
-                {errors.password && (
-                  <span className="text-xs text-red-600">{errors.password.message}</span>
-                )}
-              </div>
-            </div>
-            <div className="flex justify-end space-x-2 pt-6">
-              <Button className="w-full" type="submit" disabled={loading}>
-                {loading ? "Creating..." : "Create"}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="bg-white text-[#9747FF] hover:bg-white/90 rounded-full px-6">
+          <Plus className="mr-2 h-4 w-4" /> Create Group
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-[#1a1b4b] text-white border-[#272b91] rounded-lg">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-white">
+            Create a new chat group
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(submit)} className="space-y-6">
+          <div>
+            <label className="text-sm font-medium text-purple-300">Group Name</label>
+            <Input
+              type="text"
+              {...register("title")}
+              placeholder="Enter Group Name"
+              className="mt-1 w-full bg-[#272b91]/50 text-white border-[#9747FF] focus:border-[#9747FF] focus:ring-[#9747FF] rounded-md"
+            />
+            {errors.title && <span className="text-xs text-red-400">{errors.title.message}</span>}
+          </div>
+          <div>
+            <label className="text-sm font-medium text-purple-300">Password</label>
+            <Input
+              type="password"
+              {...register("password")}
+              placeholder="Enter Password"
+              className="mt-1 w-full bg-[#272b91]/50 text-white border-[#9747FF] focus:border-[#9747FF] focus:ring-[#9747FF] rounded-md"
+            />
+            {errors.password && (
+              <span className="text-xs text-red-400">{errors.password.message}</span>
+            )}
+          </div>
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#9747FF] text-white hover:bg-[#8a3dff] rounded-full py-2"
+          >
+            {loading ? "Creating..." : "Create Group"}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -1,4 +1,6 @@
 import React from "react";
+import { Button } from "@/components/ui/button";
+import { Users } from "lucide-react";
 import MobileChatSidebar from "./MobileChatSidebar";
 
 export default function ChatNav({
@@ -8,18 +10,23 @@ export default function ChatNav({
 }: {
   chatGroup: ChatGroupType;
   users: Array<GroupChatUserType> | [];
-  user?: GroupChatUserType;
+  user?: GroupChatUserType | null;
 }) {
   return (
-    <nav className="w-full flex justify-between items-center  px-6 py-2 border-b">
-      <div className="flex space-x-4 md:space-x-0 items-center">
+    <nav className="flex justify-between items-center px-6 py-4 bg-gray-800 text-white">
+      <div className="flex items-center space-x-4">
         <div className="md:hidden">
           <MobileChatSidebar users={users} />
         </div>
-
-        <h1 className="text-2xl font-bold ">{chatGroup.title}</h1>
+        <h1 className="text-xl font-semibold">{chatGroup.title}</h1>
       </div>
-      <p>{user?.name}</p>
+      <div className="flex items-center space-x-4">
+        <Button variant="ghost" className="text-gray-300 hover:text-white">
+          <Users className="mr-2 h-4 w-4" />
+          {users.length} Users
+        </Button>
+        {user && <p className="font-medium">{user.name}</p>}
+      </div>
     </nav>
   );
 }

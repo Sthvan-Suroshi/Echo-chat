@@ -11,9 +11,9 @@ export default async function dashboard() {
   const groups: Array<ChatGroupType> | [] = await fetchChatGroups(session?.user?.token!);
 
   return (
-    <div>
+    <div className="h-screen bg-gray-600">
       <DashNav name={session?.user?.name!} image={session?.user?.image ?? undefined} />
-      <div className="flex justify-center ">
+      <div className="flex justify-center  ">
         <div className="container">
           <div className="mt-6 text-end mb-4">
             <CreateChat user={session?.user!} />

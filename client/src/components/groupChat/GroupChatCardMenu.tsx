@@ -51,7 +51,7 @@ export default function GroupChatCardMenu({
 
       <DropdownMenu>
         <DropdownMenuTrigger>
-          <DotsVerticalIcon className="h-5 w-5" />
+          <DotsVerticalIcon className="h-5 w-5 text-white" />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem onClick={handleCopy}>Copy</DropdownMenuItem>

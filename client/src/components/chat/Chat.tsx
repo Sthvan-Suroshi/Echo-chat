@@ -1,8 +1,14 @@
+"use client";
+
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getSocket } from "@/lib/socket.config";
 import { v4 as uuidv4 } from "uuid";
+import { motion, AnimatePresence } from "framer-motion";
+import { Send } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-export default function Chats({
+export default function Chat({
   group,
   oldMessages,
   chatUser,
@@ -11,8 +17,8 @@ export default function Chats({
   oldMessages: Array<MessageType> | [];
   chatUser?: GroupChatUserType | null;
 }) {
-  const [message, setMessage] = useState(""); // can optimize using debounce
-  const [messages, setMessages] = useState<Array<MessageType>>(oldMessages); //previous msgs
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<Array<MessageType>>(oldMessages);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -21,18 +27,12 @@ export default function Chats({
 
   let socket = useMemo(() => {
     const socket = getSocket();
-
-    socket.auth = {
-      room: group.id,
-    };
-
+    socket.auth = { room: group.id };
     return socket.connect();
-  }, []);
+  }, [group.id]);
 
   useEffect(() => {
     socket.on("message", (data: MessageType) => {
-      console.log("The message is", data);
-
       setMessages((prevMessages) => [...prevMessages, data]);
       scrollToBottom();
     });
@@ -40,10 +40,11 @@ export default function Chats({
     return () => {
       socket.close();
     };
-  }, []);
+  }, [socket]);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    if (!message.trim()) return;
 
     const payload: MessageType = {
       id: uuidv4(),
@@ -55,37 +56,50 @@ export default function Chats({
 
     socket.emit("message", payload);
     setMessage("");
-    setMessages([...messages, payload]);
+    setMessages((prevMessages) => [...prevMessages, payload]);
+    scrollToBottom();
   };
 
   return (
-    <div className="flex flex-col h-[94vh]  p-4">
-      <div className="flex-1 overflow-y-auto flex flex-col-reverse">
-        <div ref={messagesEndRef} />
-        <div className="flex flex-col gap-2">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`max-w-sm rounded-lg p-2 ${
-                message.name === chatUser?.name
-                  ? "bg-gradient-to-r from-blue-400 to-blue-600  text-white self-end"
-                  : "bg-gradient-to-r from-gray-200 to-gray-300 text-black self-start"
+    <div className="flex flex-col h-[calc(100vh-4rem)] bg-gray-900 ">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+        <AnimatePresence initial={false}>
+          {messages.map((msg) => (
+            <motion.div
+              key={msg.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, transition: { duration: 0.2 } }}
+              transition={{ duration: 0.3 }}
+              className={`max-w-[50%] p-3 rounded-lg ${
+                msg.name === chatUser?.name
+                  ? "ml-auto bg-gradient-to-r from-[#1a1b4b] to-[#272b91] text-white"
+                  : "mr-auto bg-gradient-to-r from-[#151515] to-[#000000] text-gray-200"
               }`}
             >
-              {message.message}
-            </div>
+              <p className="text-sm font-semibold mb-1" ref={messagesEndRef}>{msg.name}</p>
+              <p>{msg.message}</p>
+              <p className="text-xs mt-1 opacity-70">
+                {new Date(msg.created_at).toLocaleTimeString()}
+              </p>
+            </motion.div>
           ))}
-        </div>
+        </AnimatePresence>
       </div>
-      <form onSubmit={handleSubmit} className="mt-2 flex items-center">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          value={message}
-          className="flex-1 p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-          onChange={(e) => setMessage(e.target.value)}
-        />
-      </form>
+      <div className="p-4 bg-gray-800">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <Input
+            type="text"
+            placeholder="Type a message..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="flex-1 bg-gray-700 border-0 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500"
+          />
+          <Button type="submit" size="icon" className="bg-blue-600 hover:bg-blue-700">
+            <Send className="h-5 w-5" />
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
