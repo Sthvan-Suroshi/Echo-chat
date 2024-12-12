@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - GOOGLE_CLIENT_ID=google-id
+      - GOOGLE_CLIENT_SECRET=google-secret
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=somethingsecret
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - PORT=8000
+      - REDIS_URL=redis://redis:6379
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/myapp
+      - JWT_SECRET=somethingsecret
+    depends_on:
+      - redis
+      - postgres
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=myapp
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgrespassword
+
+volumes:
+  redis_data:
+  postgres_data:
