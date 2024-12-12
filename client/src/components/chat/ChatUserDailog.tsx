@@ -19,10 +19,12 @@ export default function ChatUserDialog({
   open,
   setOpen,
   group,
+  onUserAdded,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   group: ChatGroupType;
+  onUserAdded: () => void; // Callback to refresh user list
 }) {
   const params = useParams();
   const [state, setState] = useState({
@@ -38,7 +40,7 @@ export default function ChatUserDialog({
         setOpen(false);
       }
     }
-  }, []);
+  }, [params, setOpen]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -52,14 +54,17 @@ export default function ChatUserDialog({
         });
 
         localStorage.setItem(params["id"] as string, JSON.stringify(data?.data));
+        onUserAdded(); // Trigger refresh of user list
+        toast.success("Successfully joined the group!");
       } catch (error) {
-        console.log(error);
-        toast.error("Something went wrong.please try again!");
+        console.error(error);
+        toast.error("Something went wrong. Please try again!");
+        return;
       }
     }
 
-    if (group.password != state.password) {
-      toast.error("Please enter correct passcode!");
+    if (group.password !== state.password) {
+      toast.error("Please enter the correct passcode!");
       console.log("Invalid password");
     } else {
       setOpen(false);
@@ -71,7 +76,7 @@ export default function ChatUserDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Name and Passcode</DialogTitle>
-          <DialogDescription>Add your name and passcode to join in room</DialogDescription>
+          <DialogDescription>Add your name and passcode to join the room</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="mt-2">
@@ -89,7 +94,9 @@ export default function ChatUserDialog({
             />
           </div>
           <div className="mt-2">
-            <Button className="w-full">Submit</Button>
+            <Button type="submit" className="w-full">
+              Submit
+            </Button>
           </div>
         </form>
       </DialogContent>

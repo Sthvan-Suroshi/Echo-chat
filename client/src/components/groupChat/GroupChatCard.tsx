@@ -5,7 +5,7 @@ import GroupChatCardMenu from "./GroupChatCardMenu";
 
 export default function GroupChatCard({ group, user }: { group: ChatGroupType; user: CustomUser }) {
   return (
-    <Card>
+    <Card className="hover:shadow-lg transition-shadow duration-300">
       <CardHeader className="flex-row justify-between items-center ">
         <CardTitle className="text-2xl">{group.title}</CardTitle>
         <GroupChatCardMenu user={user} group={group} />
