@@ -25,22 +25,28 @@ export default function Chat({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  let socket = useMemo(() => {
+  const socket = useMemo(() => {
     const socket = getSocket();
     socket.auth = { room: group.id };
     return socket.connect();
   }, [group.id]);
 
   useEffect(() => {
-    socket.on("message", (data: MessageType) => {
-      setMessages((prevMessages) => [...prevMessages, data]);
-      scrollToBottom();
-    });
+    const handleMessage = (data: MessageType) => {
+      if (data.name !== chatUser?.name) {
+        setMessages((prevMessages) => [...prevMessages, data]);
+        scrollToBottom();
+      }
+    };
 
+    socket.on("message", handleMessage);
+
+    // Cleanup function to remove the listener when the component unmounts or dependencies change
     return () => {
+      socket.off("message", handleMessage);
       socket.close();
     };
-  }, [socket]);
+  }, [socket, chatUser?.name]);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -54,14 +60,15 @@ export default function Chat({
       group_id: group.id,
     };
 
-    socket.emit("message", payload);
-    setMessage("");
     setMessages((prevMessages) => [...prevMessages, payload]);
+    console.log("controll reached here");
+    socket.emit("message", payload); // Send to server
+    setMessage("");
     scrollToBottom();
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-gray-900 ">
+    <div className="flex flex-col h-[calc(100vh-5rem)] bg-gray-900">
       <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
         <AnimatePresence initial={false}>
           {messages.map((msg) => (
@@ -77,14 +84,17 @@ export default function Chat({
                   : "mr-auto bg-gradient-to-r from-[#151515] to-[#000000] text-gray-200"
               }`}
             >
-              <p className="text-sm font-semibold mb-1" ref={messagesEndRef}>{msg.name}</p>
-              <p>{msg.message}</p>
-              <p className="text-xs mt-1 opacity-70">
-                {new Date(msg.created_at).toLocaleTimeString()}
-              </p>
+              <p className="text-sm font-semibold mb-1">{msg.name}</p>
+              <div className="flex justify-between flex-wrap">
+                <p>{msg.message}</p>
+                <p className="text-xs mt-1 opacity-70 text-right">
+                  {new Date(msg.created_at).toLocaleTimeString()}
+                </p>
+              </div>
             </motion.div>
           ))}
         </AnimatePresence>
+        <div ref={messagesEndRef} />
       </div>
       <div className="p-4 bg-gray-800">
         <form onSubmit={handleSubmit} className="flex items-center gap-2">

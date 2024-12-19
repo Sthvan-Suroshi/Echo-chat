@@ -55,6 +55,7 @@ export default function ChatUserDialog({
 
         localStorage.setItem(params["id"] as string, JSON.stringify(data?.data));
         onUserAdded(); // Trigger refresh of user list
+        setOpen(false);
         toast.success("Successfully joined the group!");
       } catch (error) {
         console.error(error);
