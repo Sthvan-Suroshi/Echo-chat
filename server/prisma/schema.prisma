@@ -29,7 +29,6 @@ model ChatGroup {
   created_at DateTime     @default(now())
   GroupUsers GroupUsers[]
   Chats      Chats[]
-
   @@index([created_at])
   @@map("chat_groups")
 }

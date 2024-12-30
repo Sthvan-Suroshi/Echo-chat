@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getSocket } from "@/lib/socket.config";
 import { v4 as uuidv4 } from "uuid";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Socket } from "socket.io-client";
 
 export default function Chat({
   group,
@@ -20,18 +21,19 @@ export default function Chat({
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Array<MessageType>>(oldMessages);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const socket = useMemo(() => {
+  useEffect(() => {
+    // Initialize socket connection
     const socket = getSocket();
     socket.auth = { room: group.id };
-    return socket.connect();
-  }, [group.id]);
+    socketRef.current = socket.connect();
 
-  useEffect(() => {
+    // Set up message handler
     const handleMessage = (data: MessageType) => {
       if (data.name !== chatUser?.name) {
         setMessages((prevMessages) => [...prevMessages, data]);
@@ -39,30 +41,31 @@ export default function Chat({
       }
     };
 
-    socket.on("message", handleMessage);
+    socketRef.current.on("message", handleMessage);
 
-    // Cleanup function to remove the listener when the component unmounts or dependencies change
+    // Cleanup function
     return () => {
-      socket.off("message", handleMessage);
-      socket.close();
+      if (socketRef.current) {
+        socketRef.current.off("message", handleMessage);
+        socketRef.current.disconnect();
+      }
     };
-  }, [socket, chatUser?.name]);
+  }, [group.id, chatUser?.name]); // Only re-run if group.id or chatUser.name changes
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!message.trim()) return;
+    if (!message.trim() || !socketRef.current) return;
 
     const payload: MessageType = {
       id: uuidv4(),
-      message: message,
+      message: message.trim(),
       name: chatUser?.name ?? "Unknown",
       created_at: new Date().toISOString(),
       group_id: group.id,
     };
 
     setMessages((prevMessages) => [...prevMessages, payload]);
-    console.log("controll reached here");
-    socket.emit("message", payload); // Send to server
+    socketRef.current.emit("message", payload);
     setMessage("");
     scrollToBottom();
   };

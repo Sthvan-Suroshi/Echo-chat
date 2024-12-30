@@ -7,10 +7,4 @@ const redis = new Redis({
         return Math.min(times * 50, 2000); // Reconnection strategy
     }
 });
-// Create separate clients for Pub/Sub
-export const pubClient = new Redis({
-    host: "localhost",
-    port: 6379
-});
-export const subClient = pubClient.duplicate();
 export default redis;
